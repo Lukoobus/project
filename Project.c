@@ -16,30 +16,29 @@ int main(void)
     double x = 0.5;
     double sigma = 0.01;
 
-    // Open pipe to gnuplot
-    FILE *gp = popen("gnuplot -persistent", "w");
-    if (!gp) {
-        fprintf(stderr, "Error opening pipe to gnuplot\n");
+    // Open CSV file
+    FILE *fp = fopen("data.csv", "w");
+    if (!fp) {
+        fprintf(stderr, "Error opening file for writing\n");
         return 1;
     }
 
-    // Set up Gnuplot
-    fprintf(gp, "set title 'Noisy Logistic Map'\n");
-    fprintf(gp, "set xlabel 'Iteration'\n");
-    fprintf(gp, "set ylabel 'x'\n");
-    fprintf(gp, "plot '-' with lines\n");
-    for (int n = 0; n<=100; n++)
+    // Write CSV header
+    fprintf(fp, "Iteration,Value\n");
+
+    // Generate data
+    for (int n = 0; n <= 100; n++)
     {
-        double xn = x + 0.0001*n;
+        double xn = x + 0.0001 * n;
         for (int i = 0; i <= 100; i++)
         {
             xn = r * xn * (1 - xn) + sigma * random_double();
-            fprintf(gp, "%d %lf\n", i, xn);
+            fprintf(fp, "%d,%lf\n", i, xn);  // CSV format
         }
     }
-    fprintf(gp, "e\n"); // tell gnuplot data ends
-    fflush(gp);
-    pclose(gp);
+
+    fclose(fp);
+    printf("Data saved to data.csv\n");
 
     return 0;
 }
